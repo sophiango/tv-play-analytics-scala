@@ -35,18 +35,28 @@ services:
 
     jobmanager:
         container_name: jobmanager
-        image: flink:1.17.2-scala_2.12
+#        image: flink:1.17.2-scala_2.12
+        build:
+            context: .
+            dockerfile: Dockerfile.flink
         ports:
             - "8081:8081"
         command: jobmanager
         environment:
             - JOB_MANAGER_RPC_ADDRESS=jobmanager
+        volumes:
+            - ./warehouse:/opt/flink/iceberg_warehouse
 
     taskmanager:
         container_name: taskmanager
-        image: flink:1.17.2-scala_2.12
+#        image: flink:1.17.2-scala_2.12
+        build:
+            context: .
+            dockerfile: Dockerfile.flink
         depends_on:
             - jobmanager
         command: taskmanager
         environment:
             - JOB_MANAGER_RPC_ADDRESS=jobmanager
+        volumes:
+            - ./warehouse:/opt/flink/iceberg_warehouse
