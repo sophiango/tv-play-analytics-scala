@@ -10,7 +10,7 @@ Example of event
 {
     user_id: 6-10 digit-random,
     show_id: 6-10 digit-random,
-    event_time: datetime,
+    event_ts: datetime,
     duration_sec: int,
     device: string
 }
@@ -27,8 +27,7 @@ def generate_event():
     return {
         "user_id": random.randint(100000, 1000000000),
         "show_id": random.randint(100000, 1000000000),
-        # "event_time": datetime.utcnow().isoformat(),
-        # "event_ts": time.time(),
+        "event_ts": time.time(),
         "duration_sec": random.randint(1, 5400),
         "device": random.choice(DEVICE_TYPE)
     }
