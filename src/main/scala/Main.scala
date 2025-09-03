@@ -13,24 +13,42 @@ object Main {
 			"""
 				| CREATE CATALOG iceberg WITH (
 				|   'type' = 'iceberg',
-				|   'catalog-type' = 'rest',
-				|   'uri' = 'http://iceberg-rest:8181',
+				|   'catalog-type' = 'hadoop',
 				|   'warehouse' = 'file:///opt/flink/iceberg_warehouse',
 				|   'property-version' = '1'
 				| )
 				|""".stripMargin)
 
 		tableEnv.executeSql("USE CATALOG iceberg")
-		tableEnv.executeSql("USE db")  // assuming you've created iceberg.db
+		tableEnv.executeSql("CREATE DATABASE IF NOT EXISTS tv;")
+		tableEnv.executeSql("USE tv")  // assuming you've created iceberg.db
 
+//		tableEnv.executeSql("""DROP TABLE IF EXISTS iceberg.tv.watch_events""")
+		// Iceberg sink table
+		tableEnv.executeSql(
+			"""
+				|CREATE TABLE IF NOT EXISTS watch_events (
+				| user_id INT,
+				| show_id INT,
+				| device STRING,
+				| event_ts FLOAT,
+				| duration_sec INT
+				|) WITH (
+				| 'format-version' = '2',
+				| 'write.format.default' = 'parquet'
+				|)
+				|""".stripMargin
+		)
+
+//		tableEnv.executeSql("""DROP TABLE IF EXISTS kafka_watch_events""")
 		// Kafka source table
 		tableEnv.executeSql(
 			"""
-  		|	CREATE TABLE kafka_tv_events (
-			| user_id STRING
-			| show_id STRING
-			| device STRING
-			| event_ts BIGINT
+  		|	CREATE TABLE IF NOT EXISTS kafka_watch_events (
+			| user_id INT,
+			| show_id INT,
+			| device STRING,
+			| event_ts FLOAT,
 			| duration_sec INT
 			| ) WITH (
 			| 'connector' = 'kafka',
@@ -42,23 +60,10 @@ object Main {
 			|""".stripMargin
 		)
 
-		// Iceberg sink table
 		tableEnv.executeSql(
 			"""
-			|CREATE TABLE iceberg.db.tv_play_analytics (
-			| user_id STRING
-			| show_id STRING
-			| device STRING
-			| event_ts BIGINT
-			| duration_sec INT
-			|) PARTITION BY (user_id)
-			|""".stripMargin
-		)
-
-		tableEnv.executeSql(
-			"""
-			|INSERT INTO iceberg.db.tv_play_analytics
-			|SELECT user_id, device, show_id, event_ts, duration_sec FROM kafka_tv_events
+			|INSERT INTO watch_events
+			|SELECT * FROM kafka_watch_events
 			|""".stripMargin
 		)
 

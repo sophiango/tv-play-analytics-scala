@@ -35,7 +35,6 @@ services:
 
     jobmanager:
         container_name: jobmanager
-#        image: flink:1.17.2-scala_2.12
         build:
             context: .
             dockerfile: Dockerfile.flink
@@ -43,20 +42,66 @@ services:
             - "8081:8081"
         command: jobmanager
         environment:
-            - JOB_MANAGER_RPC_ADDRESS=jobmanager
+#            - jobmanager.rpc.address=jobmanager
+#            - jobmanager.memory.process.size=1728m
+#            - taskmanager.memory.process.size=1728m
+#            - taskmanager.numberOfTaskSlots=4
+            - |
+                FLINK_PROPERTIES=
+                jobmanager.rpc.address: jobmanager
         volumes:
-            - ./warehouse:/opt/flink/iceberg_warehouse
+            - ./flink-checkpoints:/tmp/flink-checkpoints
+            - ./iceberg_warehouse:/iceberg/warehouse
+            - ./init.sql:/flink-sql/init.sql
+#            - ./flink-config:/opt/flink/conf
+            - ./flink-config/log4j-console.properties:/opt/flink/conf/log4j-console.properties
+#            - ./jars:/opt/flink/lib
+        healthcheck:
+            test: [ "CMD", "curl", "-f", "http://localhost:8081" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
 
     taskmanager:
         container_name: taskmanager
-#        image: flink:1.17.2-scala_2.12
         build:
             context: .
             dockerfile: Dockerfile.flink
         depends_on:
-            - jobmanager
+            jobmanager:
+                condition: service_healthy
         command: taskmanager
         environment:
-            - JOB_MANAGER_RPC_ADDRESS=jobmanager
+#            - jobmanager.rpc.address=jobmanager
+#            - jobmanager.memory.process.size=1728m
+#            - taskmanager.memory.process.size=1728m
+#            - taskmanager.numberOfTaskSlots=4
+            - |
+                FLINK_PROPERTIES=
+                jobmanager.rpc.address: jobmanager
         volumes:
-            - ./warehouse:/opt/flink/iceberg_warehouse
+            - ./flink-checkpoints:/tmp/flink-checkpoints
+            - ./iceberg_warehouse:/iceberg/warehouse
+#            - ./flink-config:/opt/flink/conf
+            - ./flink-config/log4j-console.properties:/opt/flink/conf/log4j-console.properties
+#            - ./jars:/opt/flink/lib
+
+#    sql-client:
+##        image: flink:1.17-scala_2.12
+#        build:
+#            context: .
+#            dockerfile: Dockerfile.flink
+#        container_name: sql-client
+#        depends_on:
+#            - jobmanager
+#            - kafka
+#        restart: on-failure
+#        entrypoint: >
+#            bash -c "sleep 10 &&
+#                     ./bin/sql-client.sh -f /flink-sql/init.sql"
+#        volumes:
+#            - ./init.sql:/flink-sql/init.sql
+##            - ./flink-config:/opt/flink/conf
+#            - ./flink-config/log4j-console.properties:/opt/flink/conf/log4j-console.properties
+##            - ./jars:/opt/flink/lib

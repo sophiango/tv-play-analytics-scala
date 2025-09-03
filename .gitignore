@@ -1,29 +1,57 @@
-# === sbt & Scala ===
-target/
-project/target/
-project/project/
-
-# === IntelliJ IDEA ===
+# IDEs
 .idea/
 *.iml
-*.ipr
-*.iws
+*.vscode/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Java/Scala build
+target/
 out/
 
-# === Mac system files ===
-.DS_Store
-
-# === Logs ===
+# Logs
 *.log
+logs/
 
-# === VS Code ===
-.vscode/
+# Checkpoints & savepoints
+flink-checkpoints/
+savepoints/
+**/checkpoint-dir/
+**/savepoint-dir/
 
-# === Docker volumes and state ===
+# Docker
 *.pid
-*.pid.lock
+*.swp
 docker-compose.override.yml
 
-# === JARs ===
+# Flink local files
+tmp/
+.opt/
+.flink/
+
+# Iceberg metadata
+iceberg_warehouse/**/.metadata/
+iceberg_warehouse/metadata/
+iceberg_warehouse/*.tmp
+iceberg_warehouse/**/metadata/
+
+# SQL output
+*.class
+*.sql.log
+
+# Misc
 *.jar
-.bsp
+*.war
+*.zip
+*.tar.gz
+*.DS_Store
+*.bak
+*.tmp
+.env
+
+iceberg_warehouse/
+flink-checkpoints/
+flink-config/
+jars/
