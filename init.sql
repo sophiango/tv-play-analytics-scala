@@ -18,6 +18,7 @@ USE tv;
 CREATE TABLE IF NOT EXISTS watch_events (
   user_id INT,
   show_id INT,
+  event_ts FLOAT,
   duration_sec INT,
   device STRING
 ) WITH (
@@ -28,6 +29,7 @@ CREATE TABLE IF NOT EXISTS watch_events (
 CREATE TEMPORARY TABLE IF NOT EXISTS kafka_watch_events (
   user_id INT,
   show_id INT,
+  event_ts FLOAT,
   duration_sec INT,
   device STRING
 ) WITH (
@@ -42,4 +44,4 @@ CREATE TEMPORARY TABLE IF NOT EXISTS kafka_watch_events (
 
 -- 5. Insert Streaming Data
 INSERT INTO watch_events
-SELECT user_id, show_id, duration_sec, device FROM kafka_watch_events;
+SELECT user_id, show_id, event_time, duration_sec, device FROM kafka_watch_events;

@@ -23,7 +23,6 @@ object Main {
 		tableEnv.executeSql("CREATE DATABASE IF NOT EXISTS tv;")
 		tableEnv.executeSql("USE tv")  // assuming you've created iceberg.db
 
-//		tableEnv.executeSql("""DROP TABLE IF EXISTS iceberg.tv.watch_events""")
 		// Iceberg sink table
 		tableEnv.executeSql(
 			"""
@@ -40,7 +39,6 @@ object Main {
 				|""".stripMargin
 		)
 
-//		tableEnv.executeSql("""DROP TABLE IF EXISTS kafka_watch_events""")
 		// Kafka source table
 		tableEnv.executeSql(
 			"""
